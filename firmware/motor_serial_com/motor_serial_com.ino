@@ -43,7 +43,7 @@ int stp_pins[3] = {X_STP, Y_STP, Z_STP};
 
 
 // AccelStepper is the class we use to run all of the motors in a parallel fashion
-// Documentation can be found here: http://www.airspayce.com/mikem/arduino/AccelStepper/classAccelStepper.html
+// Documentation can be found here: http://www.airspayce.com/mikem/arduino/AccelStepper/
 AccelStepper stepper1(AccelStepper::DRIVER, X_STP, X_DIR);
 AccelStepper stepper2(AccelStepper::DRIVER, Y_STP, Y_DIR);
 AccelStepper stepper3(AccelStepper::DRIVER, Z_STP, Z_DIR);
@@ -115,7 +115,12 @@ void _run() {
         }
       }
     }
-    // getDataFromPC();
+    getDataFromPC(); // need to test
+    if (newDataFromPC) { // need to test
+      //replyToPC(); // need to test
+      break; // need to test
+      // may need to save distances and stepper status. may need to reply to pc here also
+    }
   }
 
   digitalWrite(EN, HIGH);
@@ -139,6 +144,7 @@ void _set_speed() {
   for (int i = 0; i < 3; i += 1) {
     if (motors[i] == 1) {
       steppers[i].setMaxSpeed(args[i]);
+      steppers[i].setSpeed(args[i]);
     }
   }
 }
