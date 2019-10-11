@@ -126,6 +126,17 @@ if __name__ == "__main__":
 	"<STOP,100,0.0,0.0,0.0>"
 	]
 
+	pause_cmds = [
+	"<PAUSE,100,0.0,0.0,0.0>"
+	]
+
+	resume_cmds = [
+	"<RESUME,100,0.0,0.0,0.0>"
+	]
+
+
+
+
 	port = populate_ports()
 	print("\n[setup] Connecting to port: {}".format(port))
 	s = connect(port)
@@ -134,12 +145,24 @@ if __name__ == "__main__":
 	print(listen(s))
 
 	print("\n[setup] Sending setup commands..")
-	talk(s, run_cmds)
+	talk(s, setup_cmds)
+
+	time.sleep(1)
 
 	print("\n[action] Sending run commands..")
 	talk(s, run_cmds)
 
 	time.sleep(1)
+
+	print("\n[action] Sending pause commands..")
+	talk(s, pause_cmds)
+
+	time.sleep(1)
+
+	print("\n[action] Sending resume commands..")
+	talk(s, resume_cmds)
+
+	time.sleep(1.5)
 
 	print("\n[action] Sending stop commands..")
 	talk(s, stop_cmds)

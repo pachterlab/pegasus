@@ -77,6 +77,8 @@ float arg_m2 = 0.0;
 float arg_m3 = 0.0;
 float args[3] = {arg_m1, arg_m2, arg_m3};
 
+float remainder[3] = {0.0, 0.0, 0.0};
+
 unsigned long curMillis;
 
 
@@ -84,7 +86,7 @@ typedef void (* FreeFunction )(); // this is a pointer to a function
 
 // Setting up dictionary for easy command execution
 typedef struct {
-  uint8_t mode_idx;
+  int mode_idx;
   char* mode;
   FreeFunction function; // now in our FunctionMap type, we can reference a function by its name
 } FunctionMap;
@@ -128,12 +130,10 @@ void _run() {
         }
       }
     }
-    getDataFromPC(); // need to test
-    if (newDataFromPC) { // need to test
-      replyToPC(); // need to test
-      // need a way to log the state of the system..
-      break; // need to test
-      // may need to save distances and stepper status. may need to reply to pc here also
+    getDataFromPC();
+    if (newDataFromPC) {
+      replyToPC(); 
+      break;
     }
   }
   // Disable the steppers when not in motion
@@ -146,17 +146,26 @@ void _stop() {
   }
 }
 
-void _resume() {
-  Serial.print("_resume()");
+void _pause() {
+  for (int i = 0; i < 3; i += 1) {
+    remainder[i] = steppers[i].distanceToGo();
+  }
+
+  _stop();
 }
 
-void _pause() {
-  Serial.print("_pause()");
+void _resume() {
+  for (int i = 0; i < 3; i += 1) {
+    args[i] = remainder[i];
+  }
+  _run();
 }
+
 
 void _set_speed() {
   for (int i = 0; i < 3; i += 1) {
     if (motors[i] == 1) {
+      steppers[i].setCurrentPosition(0.0);
       steppers[i].setMaxSpeed(args[i]);
       steppers[i].setSpeed(args[i]);
     }
@@ -171,7 +180,8 @@ void _set_accel() {
   }
 }
 
-const FunctionMap functions[6] {
+const int function_count = 6;
+const FunctionMap functions[function_count] {
   {0, "RUN", _run},
   {1, "STOP", _stop},
   {2, "RESUME", _resume},
@@ -186,7 +196,7 @@ void setup() {
 
   pinMode(EN, OUTPUT);
   digitalWrite(EN, HIGH);
-  
+
   // flash LEDs so we know we are alive
   pinMode(ledPin, OUTPUT);
   digitalWrite(ledPin, HIGH);
@@ -202,7 +212,7 @@ void setup() {
     steppers[i].setCurrentPosition(0.0);
 
   }
-  
+
   // tell the PC we are ready
   Serial.println("<Arduino is ready>");
 }
@@ -297,6 +307,7 @@ void parseData() {
 
 void replyToPC() {
   if (newDataFromPC) {
+
     newDataFromPC = false;
     Serial.print("<");
     Serial.print(mode);
@@ -309,7 +320,7 @@ void replyToPC() {
     Serial.print(",");
     Serial.print(args[2]);
     Serial.println(">");
-    
+
     executeCommand = true;
   }
 }
@@ -317,14 +328,11 @@ void replyToPC() {
 void execute() {
   if (executeCommand) {
     executeCommand = false;
-    for (uint8_t i = 0; i < sizeof(functions) / sizeof(FunctionMap); i += 1) {
+    for (int i = 0; i < function_count; i++) {
       if (strcmp(mode, functions[i].mode) == 0) {
-        Serial.print("in execute");
         return (functions[i].function)(); // this just executes one function but it needs to iterate over all of them
       }
-      else {
-        return;
-      }
     }
+    return;
   }
 }
