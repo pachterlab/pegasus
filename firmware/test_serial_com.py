@@ -6,34 +6,34 @@ import glob
 import time
 
 startMarker = 60 # <
-endMarker = 62   # >
-midMarker = 44   # ,
+endMarker = 62 # >
+midMarker = 44 # ,
 
 def populate_ports():
 	"""
-	    :raises EnvironmentError:
-	        On unsupported or unknown platforms
-	    :returns:
-	        A list of the serial ports available on the system
+		:raises EnvironmentError:
+			On unsupported or unknown platforms
+		:returns:
+			A list of the serial ports available on the system
 	"""
 	if sys.platform.startswith('win'):
-	    ports = ['COM%s' % (i + 1) for i in range(256)]
+		ports = ['COM%s' % (i + 1) for i in range(256)]
 	elif sys.platform.startswith('linux') or sys.platform.startswith('cygwin'):
-	    # this excludes your current terminal "/dev/tty"
-	    ports = glob.glob('/dev/tty[A-Za-z]*')
+		# this excludes your current terminal "/dev/tty"
+		ports = glob.glob('/dev/tty[A-Za-z]*')
 	elif sys.platform.startswith('darwin'):
-	    ports = glob.glob('/dev/tty.*')
+		ports = glob.glob('/dev/tty.*')
 	else:
-	    raise EnvironmentError('Unsupported platform')
+		raise EnvironmentError('Unsupported platform')
 
 	result = []
 	for port in ports:
-	    try:
-	        s = serial.Serial(port)
-	        s.close()
-	        result.append(port)
-	    except (OSError, serial.SerialException):
-	        pass
+		try:
+			s = serial.Serial(port)
+			s.close()
+			result.append(port)
+		except (OSError, serial.SerialException):
+			pass
 	return result[-1]
 
 def connect(port):
@@ -57,7 +57,6 @@ def listen(s):
 	x = "z" # any value that is not an end- or startMarker
 
 	# wait for the start character
-
 	while  ord(x) != startMarker:
 		x = s.read()
 
@@ -71,49 +70,62 @@ def listen(s):
 	return(char)
 
 def talk(s, commands):
-	numLoops = len(commands)
 	waitingForReply = False
-	n = 0
 
-	while n < numLoops:
-		teststr = commands[n]
-
+	for teststr in commands: # could use a while loop + numloops iterator?
+		if not cmd_valid(teststr):
+			continue # returns to beginning of for loop and grabs next string
 		if waitingForReply == False:
 			write_to_Arduino(s, teststr)
 			print("Sent from PC -- " + teststr)
 			waitingForReply = True
 
 		if waitingForReply == True:
-
 			while s.inWaiting() == 0:
 				pass
 
 			dataRecvd = listen(s)
 			print("Reply Received -- " + dataRecvd)
-			n += 1
 			waitingForReply = False
 
 
 		time.sleep(0.1)
-	print("Send and receive complete\n\n")
+	print("Send and receive complete\n")
 
 
+# all this does is check if a command is formatted properly
+# used in talk() prior to sending a command to the arduino
+def cmd_valid(cmd):
+	cmds = ["RUN", "STOP", "RESUME", "PAUSE", "SET_SPEED", "SET_ACCEL"]
+	inds = ["000", "100", "010", "001", "110", "101", "011", "111"]
+	valid = False
+	if "," in cmd and cmd[0] == '<' and cmd[-1]=='>':
+		testcmd = cmd[1:].split(",")[0]
+		ind = cmd[1:].split(",")[1]
+		if testcmd in cmds and ind in inds:
+			valid = True
+			return valid
+	return valid
 
 if __name__ == "__main__":
 	test_strings = [
 	"<this should not work>",
-	"<SET_ACCEL,101,5000.0,0.0,5000.0>",
-	"<SET_SPEED,100,1000.0,0.0,0.0>",
-	"<RUN,111,200,200,200>"
+	"<Neither should this>",
+	"Or this",
+	"Or even, this>",
+	"<RUN, 123, 0.0, 0.0, 0.0>", # this shouldn't run either
+	"<SET_ACCEL,100,5000.0,5000.0.0,5000.0>",
+	"<SET_SPEED,100,1000.0,1000.0,1000.0>",
+	"<RUN,100,200.0,200.0,200.0>"
 	]
 
 	port = populate_ports()
-	print("Connecting to port: ", port)
+	print("Connecting to port: {}".format(port))
 	s = connect(port)
 
 	time.sleep(5) # wait for the arduino to initialize
-	
-	print(listen(s)) 
+
+	print(listen(s))
 
 	talk(s, test_strings)
 	s.close()

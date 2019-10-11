@@ -89,6 +89,17 @@ typedef struct {
   FreeFunction function; // now in our FunctionMap type, we can reference a function by its name
 } FunctionMap;
 
+int array_sum(int * array, int len) {
+  int arraySum;
+
+  arraySum = 0;
+  for (int index = 0; index < len; index++)
+  {
+    arraySum += array[index];
+  }
+  return arraySum;
+}
+
 // All of the functions we would want to run
 void _run() {
   for (int i = 0; i < 3; i += 1) {
@@ -98,6 +109,8 @@ void _run() {
   }
 
   int stepperStatus[3] = {0, 0, 0};
+
+  // Enable the steppers when in motion
   digitalWrite(EN, LOW);
   while (array_sum(stepperStatus, 3) != array_sum(motors, 3)) {
     // We iterate over the 3 possible steppers
@@ -115,14 +128,14 @@ void _run() {
         }
       }
     }
-    getDataFromPC(); // need to test
-    if (newDataFromPC) { // need to test
+    //getDataFromPC(); // need to test
+    //if (newDataFromPC) { // need to test
       //replyToPC(); // need to test
-      break; // need to test
+      //break; // need to test
       // may need to save distances and stepper status. may need to reply to pc here also
-    }
+    //}
   }
-
+  // Disable the steppers when not in motion
   digitalWrite(EN, HIGH);
 }
 
@@ -295,7 +308,7 @@ void replyToPC() {
     Serial.print(",");
     Serial.print(args[2]);
     Serial.println(">");
-
+    
     executeCommand = true;
   }
 }
@@ -305,23 +318,12 @@ void execute() {
     executeCommand = false;
     for (uint8_t i = 0; i < sizeof(functions) / sizeof(FunctionMap); i += 1) {
       if (strcmp(mode, functions[i].mode) == 0) {
-        return (functions[i].function)();
+        Serial.print("in execute");
+        return (functions[i].function)(); // this just executes one function but it needs to iterate over all of them
       }
       else {
         return;
       }
     }
   }
-}
-
-
-int array_sum(int * array, int len) {
-  int arraySum;
-
-  arraySum = 0;
-  for (int index = 0; index < len; index++)
-  {
-    arraySum += array[index];
-  }
-  return arraySum;
 }
