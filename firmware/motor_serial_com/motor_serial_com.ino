@@ -128,12 +128,13 @@ void _run() {
         }
       }
     }
-    //getDataFromPC(); // need to test
-    //if (newDataFromPC) { // need to test
-      //replyToPC(); // need to test
-      //break; // need to test
+    getDataFromPC(); // need to test
+    if (newDataFromPC) { // need to test
+      replyToPC(); // need to test
+      // need a way to log the state of the system..
+      break; // need to test
       // may need to save distances and stepper status. may need to reply to pc here also
-    //}
+    }
   }
   // Disable the steppers when not in motion
   digitalWrite(EN, HIGH);

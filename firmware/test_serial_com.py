@@ -90,7 +90,7 @@ def talk(s, commands):
 
 
 		time.sleep(0.1)
-	print("Send and receive complete\n")
+	print("Send and receive complete")
 
 
 # all this does is check if a command is formatted properly
@@ -108,26 +108,43 @@ def cmd_valid(cmd):
 	return valid
 
 if __name__ == "__main__":
-	test_strings = [
+	setup_cmds = [
+	"<SET_ACCEL,100,5000.0,5000.0.0,5000.0>",
+	"<SET_SPEED,100,1000.0,1000.0,1000.0>",
+	]
+
+	run_cmds = [
 	"<this should not work>",
 	"<Neither should this>",
 	"Or this",
 	"Or even, this>",
 	"<RUN, 123, 0.0, 0.0, 0.0>", # this shouldn't run either
-	"<SET_ACCEL,100,5000.0,5000.0.0,5000.0>",
-	"<SET_SPEED,100,1000.0,1000.0,1000.0>",
-	"<RUN,100,200.0,200.0,200.0>"
+	"<RUN,100,5000.0,200.0,200.0>"
+	]
+
+	stop_cmds = [
+	"<STOP,100,0.0,0.0,0.0>"
 	]
 
 	port = populate_ports()
-	print("Connecting to port: {}".format(port))
+	print("\n[setup] Connecting to port: {}".format(port))
 	s = connect(port)
 
 	time.sleep(5) # wait for the arduino to initialize
-
 	print(listen(s))
 
-	talk(s, test_strings)
+	print("\n[setup] Sending setup commands..")
+	talk(s, run_cmds)
+
+	print("\n[action] Sending run commands..")
+	talk(s, run_cmds)
+
+	time.sleep(1)
+
+	print("\n[action] Sending stop commands..")
+	talk(s, stop_cmds)
+
+	print("\n[action] Closing port..")
 	s.close()
 
 ## Set Accel to be blah
