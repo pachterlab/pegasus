@@ -34,7 +34,7 @@ class Convert:
 		steps = self.mm2steps(self.mL2mm3(mL)/syringe_area)
 		return steps
 	
-	def uL2steps(uL, syringe_area):
+	def uL2steps(self, uL, syringe_area):
 		steps = self.mm2steps(self.uL2mm3(uL)/syringe_area)
 		return steps
 	
@@ -103,7 +103,7 @@ class Convert:
 		print('\n############################################################\n')
 		return displacement
 	
-	def convert_speed(inp_speed, units, syringe_area):
+	def convert_speed(self, inp_speed, units, syringe_area):
 		length = units.split("/")[0]
 		time = units.split("/")[1]
 	
@@ -131,7 +131,7 @@ class Convert:
 		print("OUTPUT SPEED: " + str(speed) + ' steps/s')
 		return speed
 	
-	def convert_accel(accel, units, syringe_area):
+	def convert_accel(self, accel, units, syringe_area):
 		length = units.split("/")[0]
 		time = units.split("/")[1]
 		inp_accel = accel

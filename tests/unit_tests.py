@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import sys
+sys.path.append('../src')
 from serial_comm import populate_ports, connect, listen, talk
 import time
 
