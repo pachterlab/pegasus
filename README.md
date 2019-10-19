@@ -8,7 +8,9 @@ The pegasus system allows you to communicate with an Arduino from python to run 
 
 ## What is included?
 * Arduino firmware for use with an Arudino Uno
-* A python script to test running a motor.
+* A python script to test running a motor
+* Serial Communication utilities
+* Unit conversion utilities
 
 ## What do I need? (Everything is available via Amazon)
 * An [Arduino Uno](https://www.amazon.com/Arduino-A000066-ARDUINO-UNO-R3/dp/B008GRTSV6/ref=sr_1_3?keywords=arduino&qid=1570988503&sr=8-3) (or cheap knockoff)
@@ -31,8 +33,8 @@ Open up the [Arduino IDE](https://www.arduino.cc/en/main/software) and load up `
 
 Go to the terminal and run the test script
 ```
-$ chmod +x test_serial_com.py
-$ ./test_serial_com.py
+$ chmod +x unit_tests.py
+$ ./unit_tests.py
 ```
 
 The code should do the following:
@@ -61,7 +63,7 @@ aeg_m3 is [any floating number]
 Make sure that the port the code connects to is the correct port. Notice in the following example, my computer connected to the wrong port (Bluetooth port). 
 
  ```
- $ ./test_serial_com.py
+ $ ./unit_tests.py
  [setup] Connecting to port: /dev/tty.Bluetooth-Incoming-Port
 Traceback (most recent call last):
   File "./test_serial_com.py", line 145, in <module>
@@ -71,7 +73,7 @@ Traceback (most recent call last):
 TypeError: ord() expected a character, but string of length 0 found
 ```
 
-If you get the above error then chances are you either 1. don't have the Arduino connected, 2. tried to run the test code while the Arduino firmware was being uploaded to the arduino or 3. the code selected the wrong port programmatically. Check out the `populate_ports()` in the python script. The return `return result[-1]` automatically returns the last port in the list of `result` ports.
+If you get the above error then chances are you either 1. don't have the Arduino connected, 2. tried to run the test code while the Arduino firmware was being uploaded to the arduino or 3. the code selected the wrong port programmatically. Check out the port variable that is assigned to `populate_ports()[-1]` in the python script. This automatically returns the last port in the list of `populate_ports()` ports.
 
 ## Acknowledgements
 This work would not have been possible without the help of the wonderful [Serial Communications Basics Tutorial](https://forum.arduino.cc/index.php?topic=396450.0) by Robin2 at the [Arduino Forum](https://forum.arduino.cc/index.php) and the really awesome [AccelStepper Library](http://www.airspayce.com/mikem/arduino/AccelStepper/classAccelStepper.html) made by Mike McCauley. Also a big thank you to [Professor Lior Pachter](https://liorpachter.wordpress.com) for supporting my work while doing a PhD in [his lab at Caltech](https://pachterlab.github.io).
