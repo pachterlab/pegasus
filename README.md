@@ -33,6 +33,7 @@ Open up the [Arduino IDE](https://www.arduino.cc/en/main/software) and load up `
 
 Go to the terminal and run the test script
 ```
+$ cd tests
 $ chmod +x unit_tests.py
 $ ./unit_tests.py
 ```
