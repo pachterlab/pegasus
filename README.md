@@ -64,11 +64,17 @@ Make sure that the port the code connects to is the correct port. Notice in the 
 
  ```
  $ ./unit_tests.py
- [setup] Connecting to port: /dev/tty.Bluetooth-Incoming-Port
+---------------- Testing Valid Cmd ----------------
+
+[setup] Connecting to port: /dev/tty.Bluetooth-Incoming-Port
 Traceback (most recent call last):
-  File "./test_serial_com.py", line 145, in <module>
+  File "./unit_tests.py", line 156, in <module>
+    main()
+  File "./unit_tests.py", line 141, in main
+    test_valid_cmd()
+  File "./unit_tests.py", line 42, in test_valid_cmd
     print(listen(s))
-  File "./test_serial_com.py", line 60, in listen
+  File "pegasus/firmware/serial_comm.py", line 128, in listen
     while  ord(x) != startMarker:
 TypeError: ord() expected a character, but string of length 0 found
 ```
