@@ -125,8 +125,13 @@ def listen(s):
 	x = "z" # any value that is not an end- or startMarker
 
 	# wait for the start character
-	while  ord(x) != startMarker:
+	while  True:
 		x = s.read()
+		try:
+			if ord(x) == startMarker:
+				break
+		except:
+			pass
 
 	# save data until the end marker is found
 	while ord(x) != endMarker:
@@ -162,7 +167,7 @@ def talk(s, commands):
 			continue # returns to beginning of for loop and grabs next string
 		if waitingForReply == False:
 			write_to_serial(s, teststr)
-			print("Sent from PC -- " + teststr)
+			# print("Sent from PC -- " + teststr) # Prints out what was sent to the Arduino
 			waitingForReply = True
 
 		if waitingForReply == True:
@@ -170,12 +175,12 @@ def talk(s, commands):
 				pass
 
 			dataRecvd = listen(s)
-			print("Reply Received -- " + dataRecvd)
+			# print("Reply Received -- " + dataRecvd) # Prints out what was received by the Arduino
 			waitingForReply = False
 
 
 		time.sleep(0.1)
-	print("Send and receive complete")
+	# print("Send and receive complete")
 
 
 def cmd_valid(cmd):
