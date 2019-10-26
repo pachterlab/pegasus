@@ -115,6 +115,7 @@ If you get the above error then chances are you either 1. don't have the Arduino
 2. Different units: currently only steps/s is supported
 3. Microstepping: currently only 1/1 microstepping is supported
 4. Additional encoders: currently only one encoder reports back to the GUI
+5. Custom acceleration
 
 ## Acknowledgements
 This work would not have been possible without the help of the wonderful [Serial Communications Basics Tutorial](https://forum.arduino.cc/index.php?topic=396450.0) by Robin2 at the [Arduino Forum](https://forum.arduino.cc/index.php) and the really awesome [AccelStepper Library](http://www.airspayce.com/mikem/arduino/AccelStepper/classAccelStepper.html) made by Mike McCauley and the amazing [Encoder Library](https://www.pjrc.com/teensy/td_libs_Encoder.html) made by Paul Stoffregen. Also a big thank you to [Professor Lior Pachter](https://liorpachter.wordpress.com) for supporting my work while doing a PhD in [his lab at Caltech](https://pachterlab.github.io).
