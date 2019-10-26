@@ -1,7 +1,9 @@
 # pegasus: open source stepper motor control
 
+[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
+
 A modular, reliable, and easy-to-use stepper motor controller written in Python and Arduino. Control up to 3 stepper motors simulatenously.
-__________________________________
+
 ![poseidon_logo](docs/example.png)
 
 ## The tl;dr
