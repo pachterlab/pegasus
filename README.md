@@ -30,6 +30,9 @@ The pegasus system allows you to communicate with an Arduino from python to run 
 *  [Timing belot pulley](https://www.amazon.com/Qunqi-Aluminum-Timing-Pulley-Printer/dp/B01IMR6OR0/ref=sr_1_19?keywords=stepper+motor+timing+belt&qid=1572125697&sr=8-19)
 * [Timing belt](https://www.amazon.com/iOrion-Printer-Timing-Closed-Rubber/dp/B07KK86NYX/ref=sr_1_9?keywords=stepper+motor+timing+belt&qid=1572125757&sr=8-9)
 
+![encoder_1](docs/encoder_1.jpg)
+![encoder_2](docs/encoder_2.jpg)
+
 ## Getting Started
 Setup the hardware by following this [instructional video](https://www.youtube.com/watch?v=Xl02fsRCJ7U). connect the arduino to your computer, and connect the CNC shield to a power outlet.
 
