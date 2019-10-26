@@ -5,10 +5,15 @@ import pegasus_window
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog
 
+from pyqtgraph.Qt import QtGui, QtCore
+import pyqtgraph as pg
+
 import sys
 import os
 import time
 import threading
+import functools
+import numpy as np
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.getcwd(), os.pardir)))
 from serial_comm import populate_ports, connect, talk, listen
@@ -30,7 +35,7 @@ class MainWindow(QtWidgets.QMainWindow, pegasus_window.Ui_MainWindow):
 		self.all_jog_deltas = ["0.01", "0.1", "1.0", "10.0", "100.0"]
 
 		# This will need to be changed
-		self.accels = [2000.0, 2000.0, 2000.0]
+		self.accels = [5000.0, 5000.0, 5000.0]
 
 		self.enable_boxes = [getattr(self.ui, i+"_enable_CHECK_BOX") for i in ["x", "y", "z"]]
 		self.displacement_boxes = [getattr(self.ui, i+"_displacement_SPIN_BOX") for i in ["x", "y", "z"]]
@@ -86,6 +91,10 @@ class MainWindow(QtWidgets.QMainWindow, pegasus_window.Ui_MainWindow):
 		self.threadpool = QtCore.QThreadPool()
 		print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
 
+		## Setting up plots
+		self.ui.speed_WIDGET.p.setLabel('left', "Speed")
+
+
 ## Populators
 	def populate_ports(self):
 		self.ui.motor_port_COMBO_BOX.clear()
@@ -136,6 +145,7 @@ class MainWindow(QtWidgets.QMainWindow, pegasus_window.Ui_MainWindow):
 				self._setup_accel()
 
 				# Start the encoder thread
+				 ## may need to delete
 				self.thread = Thread(self.encoder)
 				self.thread.finished.connect(lambda:self.thread_finished(self.thread))
 				self.thread.start()
@@ -200,25 +210,78 @@ class MainWindow(QtWidgets.QMainWindow, pegasus_window.Ui_MainWindow):
 		return talk(self.motor_serial, cmd)
 
 	def encoder(self):
+		
+		windowWidth = 50                       # width of the window displaying the curve
+		Xm = np.linspace(0,0,windowWidth)          # create array that will contain the relevant time series     
+		ptr1 = -windowWidth                      # set first x position
+		Ym = np.linspace(0,0,windowWidth)          # create array that will contain the relevant time series     
+		ptr2 = -windowWidth
 		while self.encoder_serial.inWaiting() == 0:
 				pass
 		self.encoder_serial.flushInput()
 
+		t0 = 0
+		x0 = 0
+		v = 0
 		while True:
 			while self.encoder_serial.inWaiting() == 0:
 				pass
 
+			t = self.current_milli_time()
 
+
+
+			#print("Before data: ", t)
 			data = listen(self.encoder_serial).split(",")
-			t_tmp, x_tmp, v_tmp = data
-			self.ui.position_LCD_NUM.display(x_tmp)
-			self.ui.speed_LCD_NUM.display(v_tmp)
+
+			arduno_time, x = map(float, data)
+
+			dt = t-t0
+			dx = x-x0
+
+			# print("Out loop: ", v, dx, dt, t0, t, x0, x)
+			if abs(dt) > 100:
+				if abs(dx) > 120: ## Every 10 steps
+					v = dx/dt
+					omega = v * 1000 / 12 # normalize by steps and convert to seconds
+					# print(omega)
+					# print("In loop: ", v, dx, dt, t0, t, x0, x)
+
+					self.ui.speed_LCD_NUM.display(omega)
+
+					t0 = t
+					x0 = x
+
+					Xm = self.update(Xm, ptr1, x, self.ui.displacement_WIDGET)
+					Ym = self.update(Ym, ptr2, omega, self.ui.speed_WIDGET)
+
+
+			self.ui.position_LCD_NUM.display(int(x/12))
+
 			# print("{}\t{}\t{}".format(t_tmp, x_tmp, v_tmp))
+
+
+
+	## TODO: 	
+	# Realtime data plot. Each time this function is called, the data display is updated
+	def update(self, Xm, ptr, value, widget):
+		Xm[:-1] = Xm[1:]                      # shift data in the temporal mean 1 sample left
+
+		Xm[-1] = float(value)                 # vector containing the instantaneous values      
+		ptr += 1                              # update x position for displaying the curve
+		widget.curve.setData(Xm)                     # set the curve with this data
+		widget.curve.setPos(ptr,0)                   # set x position in the graph to 0
+
+		QtGui.QApplication.processEvents()    # you MUST process the plot now
+		return Xm
 
 	def thread_finished(self, th):
 		print("Your thread has completed. Now terminating..")
 		th.stop()
 		print("Thread has been terminated.")
+
+	def current_milli_time(self):
+		return int(round(time.time() * 1000))
 
 
 ## Setters
@@ -270,6 +333,9 @@ def main():
 	window = MainWindow()
 	window.setWindowTitle("Pegasus Motor Controller")
 	window.show()
+
+	# p = window.addPlot(title="Realtime plot")  # creates empty space for the plot in the window
+	# curve = p.plot()                        # create an empty "plot" (a curve to plot)
 
 	# without this, the script exits immediately.
 	ret = app.exec_()

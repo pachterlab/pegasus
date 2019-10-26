@@ -39,23 +39,21 @@ void loop() {
   newMillis = millis();
   dt = newMillis - oldMillis;
 
-  if (abs(dt) > 50) {
-    if (abs(dx) > 0) {
-      t = t + dt;
-      omega = dx * 250 / dt / 3;
+  if (abs(dx) > 0) {
+    //if (abs(dx) > 0) {
+    //t = t + dt;
+    //omega = dx * 250 / dt / 3;
 
-      Serial.print("<");
-      Serial.print(t / 1000);
-      Serial.print(",");
-      Serial.print(newPosition / 12);
-      Serial.print(",");
-      Serial.print(omega);
-      Serial.println(">");
+    Serial.print("<");
+    Serial.print(t / 1000);
+    Serial.print(",");
+    Serial.print(newPosition);
+    Serial.println(">");
 
-      oldMillis = newMillis;
+    oldMillis = newMillis;
 
-      oldPosition = newPosition;
-    }
+    oldPosition = newPosition;
+    //}
     // long toprint = oldPosition/4/3;
     //Serial.println(toprint);
   }

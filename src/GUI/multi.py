@@ -42,7 +42,7 @@ class Thread(QtCore.QThread):
 		try:
 			result = self.fn(*self.args, **self.kwargs)
 		except:
-			pass
+			pass # uncomment when done debugging
 			# traceback.print_exc()
 			# exctype, value = sys.exc_info()[:2]
 			# self.signals.error.emit((exctype, value, traceback.format_exc()))
